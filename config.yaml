@@ -1,0 +1,25 @@
+app:
+  name: "Ransomware Detection and Response System"
+  version: "1.0.0"
+
+monitoring:
+  watch_folders:
+    - "data/sandbox"
+
+  entropy:
+    sample_size: 65536
+    suspicious_threshold: 7.0
+
+  file_activity:
+    suspicious_extension_threshold: 3
+    rapid_change_threshold: 10
+    time_window_seconds: 5
+
+logging:
+  directory: "logs"
+  rotation: "10 MB"
+  retention: "7 days"
+  level: "INFO"
+
+database:
+  path: "data/rdrs.db"
