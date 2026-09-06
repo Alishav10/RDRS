@@ -14,6 +14,7 @@ monitoring:
     suspicious_extension_threshold: 3
     rapid_change_threshold: 10
     time_window_seconds: 5
+    detection_window_seconds: 60
 
 logging:
   directory: "logs"

@@ -11,6 +11,7 @@ from app.core.config import config
 from app.core.logging_config import get_event_logger
 from app.database.database import SessionLocal
 from app.database.models import Event
+from app.detectors.detection_engine import DetectionEngine
 
 
 @dataclass
@@ -29,6 +30,10 @@ class RDRSEventHandler(FileSystemEventHandler):
 
         self.event_count = 0
         self.event_logger = get_event_logger()
+        
+        # Detection engine maintains the 60-second
+        # sliding window of recent file events.
+        self.detection_engine = DetectionEngine()
 
     def _create_event(
         self,
@@ -129,13 +134,16 @@ class RDRSEventHandler(FileSystemEventHandler):
         self.event_count += 1
 
         print(
-            f"[{file_event.timestamp:%H:%M:%S}] "
-            f"{file_event.event_type:<8} "
-            f"{file_event.file_path} "
-            f"(count={self.event_count})"
+        f"[{file_event.timestamp:%H:%M:%S}] "
+        f"{file_event.event_type:<8} "
+        f"{file_event.file_path} "
+        f"(count={self.event_count})"
         )
 
-        # Save event to database
+    # ----------------------------------------
+    # SAVE EVENT TO DATABASE
+    # ----------------------------------------
+
         try:
 
             self._save_to_database(file_event)
@@ -143,11 +151,55 @@ class RDRSEventHandler(FileSystemEventHandler):
         except Exception as error:
 
             print(
-                f"[DATABASE ERROR] "
-                f"Could not save event: {error}"
+            f"[DATABASE ERROR] "
+            f"Could not save event: {error}"
             )
 
-        # Save event to log file
+    # ----------------------------------------
+    # SEND EVENT TO DETECTION ENGINE
+    # ----------------------------------------
+
+        try:
+
+            signal = self.detection_engine.add_event(
+            file_event
+            )
+
+            print(
+            f"  Detection | "
+            f"modified={signal.files_modified} | "
+            f"renames={signal.renames} | "
+            f"extension_changes={signal.extension_changes} | "
+            f"entropy={signal.average_entropy:.2f}"
+            )
+
+            if signal.dangerous_burst:
+
+                print()
+                print("!" * 70)
+                print("!!! DANGEROUS FILE ACTIVITY DETECTED !!!")
+                print("!" * 70)
+
+                for reason in signal.reasons:
+
+                    print(
+                        f"  REASON: {reason}"
+                    )
+
+                print("!" * 70)
+                print()
+
+        except Exception as error:
+
+            print(
+                f"[DETECTION ERROR] "
+                f"Could not analyze event: {error}"
+            )
+
+    # ----------------------------------------
+    # LOG EVENT
+    # ----------------------------------------
+
         self.event_logger.info(
             f"{file_event.event_type} | "
             f"path={file_event.file_path} | "
