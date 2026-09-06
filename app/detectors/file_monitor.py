@@ -12,6 +12,7 @@ from app.core.logging_config import get_event_logger
 from app.database.database import SessionLocal
 from app.database.models import Event
 from app.detectors.detection_engine import DetectionEngine
+from app.response.response_manager import ResponseManager
 
 
 @dataclass
@@ -34,6 +35,8 @@ class RDRSEventHandler(FileSystemEventHandler):
         # Detection engine maintains the 60-second
         # sliding window of recent file events.
         self.detection_engine = DetectionEngine()
+        self.response_manager = ResponseManager()
+        self.incident_active = False
 
     def _create_event(
         self,
@@ -170,23 +173,79 @@ class RDRSEventHandler(FileSystemEventHandler):
             f"modified={signal.files_modified} | "
             f"renames={signal.renames} | "
             f"extension_changes={signal.extension_changes} | "
-            f"entropy={signal.average_entropy:.2f}"
+            f"entropy={signal.average_entropy:.2f} | "
+            f"score={signal.threat_score}/100 | "
+            f"level={signal.threat_level}"
             )
 
-            if signal.dangerous_burst:
+            if signal.threat_level == "CRITICAL":
 
-                print()
-                print("!" * 70)
-                print("!!! DANGEROUS FILE ACTIVITY DETECTED !!!")
-                print("!" * 70)
+                if not self.incident_active:
 
-                for reason in signal.reasons:
+                    print("!" * 70)
+                    print("!!! CRITICAL THREAT DETECTED !!!")
+                    print("!" * 70)
 
                     print(
-                        f"  REASON: {reason}"
+                        f"  Threat Score: "
+                        f"{signal.threat_score}/100"
                     )
 
-                print("!" * 70)
+                    print(
+                        f"  Threat Level: "
+                        f"{signal.threat_level}"
+                    )
+
+                    print("\n  Detection Reasons:")
+
+                    for reason in signal.reasons:
+                        print(f"    - {reason}")
+
+                    print("\n  Scoring Reasons:")
+
+                    for reason in signal.scoring_reasons:
+                        print(f"    - {reason}")
+
+                    print("!" * 70)
+
+                    affected_files = (
+                        self.detection_engine
+                        .get_affected_files()
+                    )
+
+                    response_result = (
+                        self.response_manager.handle_detection(
+                            signal=signal,
+                            affected_files=affected_files,
+                            suspect_process="RDRS monitored activity",
+                        )
+                    )
+
+                    self.incident_active = True
+
+                    print(
+                        "\n  RESPONSE EXECUTED"
+                    )
+
+                    print(
+                        f"  Incident ID: "
+                        f"{response_result['incident_id']}"
+                    )
+
+                    print(
+                        f"  Score ID: "
+                        f"{response_result['score_id']}"
+                    )
+
+                    print(
+                        f"  Evidence copied: "
+                        f"{len(response_result['copied_files'])}"
+                    )
+
+            else:
+
+                # The previous Critical activity has ended.
+                self.incident_active = False
                 print()
 
         except Exception as error:
@@ -195,7 +254,6 @@ class RDRSEventHandler(FileSystemEventHandler):
                 f"[DETECTION ERROR] "
                 f"Could not analyze event: {error}"
             )
-
     # ----------------------------------------
     # LOG EVENT
     # ----------------------------------------

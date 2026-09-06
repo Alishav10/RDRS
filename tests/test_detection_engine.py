@@ -127,3 +127,61 @@ def test_high_entropy_triggers_burst(tmp_path):
         "entropy" in reason.lower()
         for reason in signal.reasons
     )
+
+def test_get_affected_files_returns_unique_paths():
+    from app.detectors.file_monitor import FileEvent
+    from datetime import datetime
+
+    engine = DetectionEngine(window_seconds=60)
+
+    event1 = FileEvent(
+        event_type="MODIFY",
+        file_path="data/sandbox/file1.txt",
+        timestamp=datetime.now(),
+        extension=".txt",
+    )
+
+    event2 = FileEvent(
+        event_type="MODIFY",
+        file_path="data/sandbox/file1.txt",
+        timestamp=datetime.now(),
+        extension=".txt",
+    )
+
+    event3 = FileEvent(
+        event_type="RENAME",
+        file_path="data/sandbox/file2.lock",
+        old_path="data/sandbox/file2.txt",
+        timestamp=datetime.now(),
+        extension=".lock",
+    )
+
+    engine.add_event(event1)
+    engine.add_event(event2)
+    engine.add_event(event3)
+
+    affected_files = engine.get_affected_files()
+
+    assert affected_files == [
+        "data/sandbox/file1.txt",
+        "data/sandbox/file2.lock",
+        "data/sandbox/file2.txt",
+    ]
+
+def test_detection_engine_calculates_critical_threat_score():
+    from app.detectors.file_monitor import FileEvent
+    from datetime import datetime
+
+    engine = DetectionEngine(window_seconds=60)
+
+    for index in range(10):
+        event = FileEvent(
+            event_type="MODIFY",
+            file_path=f"data/sandbox/score-test-{index}.txt",
+            timestamp=datetime.now(),
+            extension=".txt",
+        )
+        signal = engine.add_event(event)
+
+    assert signal.threat_score >= 40
+    assert signal.threat_level in {"WARNING", "CRITICAL"}

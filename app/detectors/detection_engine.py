@@ -5,6 +5,7 @@ from pathlib import Path
 
 from app.core.config import config
 from app.core.entropy import calculate_file_entropy
+from app.detectors.threat_scorer import ThreatScorer
 
 
 @dataclass
@@ -19,6 +20,12 @@ class DetectionSignal:
     average_entropy: float
     window_seconds: int
     dangerous_burst: bool
+    rapid_encryption: bool
+    mass_rename: bool
+    high_entropy: bool
+    threat_score: int
+    threat_level: str
+    scoring_reasons: list[str]
     reasons: list[str]
 
 
@@ -29,6 +36,7 @@ class DetectionEngine:
 
     def __init__(self, window_seconds=None):
 
+        self.threat_scorer = ThreatScorer()
         file_config = config["monitoring"]["file_activity"]
 
         if window_seconds is None:
@@ -44,6 +52,10 @@ class DetectionEngine:
         # Thresholds.
         self.modified_threshold = file_config[
             "rapid_change_threshold"
+        ]
+
+        self.rename_threshold = file_config[
+            "rename_threshold"
         ]
 
         self.extension_threshold = file_config[
@@ -164,9 +176,55 @@ class DetectionEngine:
         # DETECTION DECISION
         # ----------------------------------------
 
-        dangerous_burst = False
+        rapid_encryption = (
+            files_modified >= self.modified_threshold
+        )
+
+        mass_rename = (
+            renames >= self.rename_threshold
+        )
+
+        high_entropy = (
+            average_entropy >= self.entropy_threshold
+        )
+
+        threat_score = self.threat_scorer.calculate(
+            rapid_encryption=rapid_encryption,
+            mass_rename=mass_rename,
+            high_entropy=high_entropy,
+        )
+
+        dangerous_burst = (
+            rapid_encryption
+            or mass_rename
+            or high_entropy
+        )
 
         reasons = []
+
+        if rapid_encryption:
+            reasons.append(
+                f"High file modification rate: "
+                f"{files_modified} unique files modified "
+                f"in {self.window_seconds} seconds"
+            )
+
+        if mass_rename:
+            reasons.append(
+                f"Mass file rename activity: {renames} renames"
+            )
+
+        if extension_changes >= self.extension_threshold:
+            reasons.append(
+                f"Multiple extension changes: "
+                f"{extension_changes}"
+            )
+
+        if high_entropy:
+            reasons.append(
+                f"High average file entropy: "
+                f"{average_entropy:.2f}"
+            )
 
         if files_modified >= self.modified_threshold:
 
@@ -203,6 +261,12 @@ class DetectionEngine:
             average_entropy=average_entropy,
             window_seconds=self.window_seconds,
             dangerous_burst=dangerous_burst,
+            rapid_encryption=rapid_encryption,
+            mass_rename=mass_rename,
+            high_entropy=high_entropy,
+            threat_score=threat_score.score,
+            threat_level=threat_score.level,
+            scoring_reasons=threat_score.reasons,
             reasons=reasons,
         )
 
@@ -265,3 +329,34 @@ class DetectionEngine:
         ):
 
             return None
+
+    def get_affected_files(self):
+
+            """
+            Return unique file paths involved in the
+            current detection window.
+
+            This is used by the response system to
+            preserve evidence.
+            """
+
+            affected_files = []
+            seen = set()
+
+            for event in self.events:
+                paths = [
+                    event.file_path,
+                    event.old_path,
+                ]
+
+                for file_path in paths:
+                    if not file_path:
+                        continue
+
+                    if file_path in seen:
+                        continue
+
+                    seen.add(file_path)
+                    affected_files.append(file_path)
+
+            return affected_files

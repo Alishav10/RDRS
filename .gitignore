@@ -17,6 +17,7 @@ data/*.sqlite3
 
 # Sandbox test files
 data/sandbox/*
+data/quarantine/*
 
 # Environment / secrets
 .env

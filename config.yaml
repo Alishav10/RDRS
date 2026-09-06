@@ -13,6 +13,7 @@ monitoring:
   file_activity:
     suspicious_extension_threshold: 3
     rapid_change_threshold: 10
+    rename_threshold: 3
     time_window_seconds: 5
     detection_window_seconds: 60
 
@@ -24,3 +25,19 @@ logging:
 
 database:
   path: "data/rdrs.db"
+
+threat_scoring:
+  weights:
+    rapid_encryption: 40
+    mass_rename: 30
+    high_entropy: 25
+    cpu_spike: 15
+    unknown_program: 10
+
+  levels:
+    normal_max: 40
+    warning_max: 70
+
+response:
+  simulation_mode: true
+  quarantine_directory: "data/quarantine"
