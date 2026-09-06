@@ -1,70 +1,80 @@
-# from pathlib import Path
-# import os
-
-# from app.core.entropy import calculate_entropy, calculate_file_entropy
-
-
-# def main():
-
-#     print("RDRS Entropy Detector")
-#     print("=====================")
-
-#     # Predictable data
-#     predictable = b"A" * 10000
-
-#     print(
-#         f"Repeated A entropy: "
-#         f"{calculate_entropy(predictable):.4f}"
-#     )
-
-#     # Normal text
-#     text = (
-#         b"RDRS is a defensive ransomware detection system. "
-#         b"It monitors file activity and calculates entropy."
-#         * 100
-#     )
-
-#     print(
-#         f"Text entropy: "
-#         f"{calculate_entropy(text):.4f}"
-#     )
-
-#     # Random bytes
-#     random_data = os.urandom(65536)
-
-#     print(
-#         f"Random data entropy: "
-#         f"{calculate_entropy(random_data):.4f}"
-#     )
-
-#     # Actual file
-#     sandbox_file = Path("data/sandbox/normal.txt")
-
-#     if sandbox_file.exists():
-#         print(
-#             f"normal.txt entropy: "
-#             f"{calculate_file_entropy(sandbox_file):.4f}"
-#         )
-
-
-# if __name__ == "__main__":
-#     main()
+import threading
+import time
 
 from app.core.logging_config import setup_logging
 from app.detectors.file_monitor import FileMonitor
+from app.detectors.process_monitor import ProcessMonitor
+
+
+def run_file_monitor():
+    """
+    Run the file monitoring system.
+    """
+
+    monitor = FileMonitor()
+    monitor.start()
+
+
+def run_process_monitor():
+    """
+    Run the process monitoring system.
+    """
+
+    monitor = ProcessMonitor()
+
+    try:
+
+        while True:
+
+            monitor.print_snapshot()
+
+            time.sleep(5)
+
+    except KeyboardInterrupt:
+
+        print("\nProcess monitoring stopped.")
 
 
 def main():
 
     setup_logging()
 
-    print("=" * 50)
-    print("RDRS - Ransomware Detection and Response System")
-    print("=" * 50)
+    print("=" * 80)
+    print("RDRS - RANSOMWARE DETECTION AND RESPONSE SYSTEM")
+    print("=" * 80)
 
-    monitor = FileMonitor()
+    print("\nStarting monitoring components...")
+    print("File monitoring: ACTIVE")
+    print("Process monitoring: ACTIVE")
+    print("Database: SQLite")
+    print("\nPress CTRL+C to stop RDRS.\n")
 
-    monitor.start()
+    # Create threads
+    file_thread = threading.Thread(
+        target=run_file_monitor,
+        daemon=True,
+    )
+
+    process_thread = threading.Thread(
+        target=run_process_monitor,
+        daemon=True,
+    )
+
+    # Start both monitors
+    file_thread.start()
+    process_thread.start()
+
+    try:
+
+        while True:
+            time.sleep(1)
+
+    except KeyboardInterrupt:
+
+        print("\n")
+        print("=" * 80)
+        print("RDRS STOPPED")
+        print("=" * 80)
 
 
 if __name__ == "__main__":

@@ -9,14 +9,12 @@ from watchdog.observers import Observer
 
 from app.core.config import config
 from app.core.logging_config import get_event_logger
+from app.database.database import SessionLocal
+from app.database.models import Event
 
 
 @dataclass
 class FileEvent:
-    """
-    Represents a normalized RDRS filesystem event.
-    """
-
     event_type: str
     file_path: str
     timestamp: datetime
@@ -98,6 +96,34 @@ class RDRSEventHandler(FileSystemEventHandler):
 
         self._process_event(file_event)
 
+    def _save_to_database(self, file_event: FileEvent):
+
+        db = SessionLocal()
+
+        try:
+
+            event_record = Event(
+                event_type=file_event.event_type,
+                file_path=file_event.file_path,
+                timestamp=file_event.timestamp,
+                extension=file_event.extension,
+                old_path=file_event.old_path,
+            )
+
+            db.add(event_record)
+
+            db.commit()
+
+        except Exception:
+
+            db.rollback()
+
+            raise
+
+        finally:
+
+            db.close()
+
     def _process_event(self, file_event: FileEvent):
 
         self.event_count += 1
@@ -109,6 +135,19 @@ class RDRSEventHandler(FileSystemEventHandler):
             f"(count={self.event_count})"
         )
 
+        # Save event to database
+        try:
+
+            self._save_to_database(file_event)
+
+        except Exception as error:
+
+            print(
+                f"[DATABASE ERROR] "
+                f"Could not save event: {error}"
+            )
+
+        # Save event to log file
         self.event_logger.info(
             f"{file_event.event_type} | "
             f"path={file_event.file_path} | "
@@ -129,6 +168,7 @@ class FileMonitor:
     def __init__(self):
 
         self.observer = Observer()
+
         self.handler = RDRSEventHandler()
 
     def start(self):
@@ -136,6 +176,7 @@ class FileMonitor:
         watch_folders = config["monitoring"]["watch_folders"]
 
         if not watch_folders:
+
             raise ValueError(
                 "No watch folders configured."
             )
@@ -167,12 +208,22 @@ class FileMonitor:
         try:
 
             while True:
+
                 time.sleep(1)
 
         except KeyboardInterrupt:
 
-            print("\nStopping RDRS file monitor...")
+            print(
+                "\nStopping RDRS file monitor..."
+            )
 
             self.observer.stop()
 
         self.observer.join()
+
+
+if __name__ == "__main__":
+
+    monitor = FileMonitor()
+
+    monitor.start()
