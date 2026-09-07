@@ -1,3 +1,4 @@
+
 from pathlib import Path
 from datetime import datetime
 
@@ -7,32 +8,27 @@ from app.core.logging_config import (
     get_audit_logger,
 )
 from app.database.database import SessionLocal
-from app.database.models import Incident
+from app.database.models import Incident, Alert
 
 
 class IncidentManager:
     """
-    Handles incident creation and evidence preservation.
+    Handles incident creation and alert generation.
 
     Response is defensive and copy-only.
     Original evidence files are never modified or deleted.
     """
 
     def __init__(self):
-
         self.alert_logger = get_alert_logger()
         self.audit_logger = get_audit_logger()
 
         response_config = config["response"]
 
-        self.simulation_mode = response_config[
-            "simulation_mode"
-        ]
+        self.simulation_mode = response_config["simulation_mode"]
 
         self.quarantine_directory = Path(
-            response_config[
-                "quarantine_directory"
-            ]
+            response_config["quarantine_directory"]
         )
 
         self.quarantine_directory.mkdir(
@@ -48,10 +44,6 @@ class IncidentManager:
         affected_files,
         suspect_process=None,
     ):
-        """
-        Create a security incident in the database.
-        """
-
         description = (
             "RDRS detected suspicious ransomware-like "
             "file activity.\n\n"
@@ -75,11 +67,12 @@ class IncidentManager:
         db = SessionLocal()
 
         try:
+            # -------------------------------------------------
+            # 1. Create incident
+            # -------------------------------------------------
 
             incident = Incident(
-                title=(
-                    "Possible Ransomware Activity"
-                ),
+                title="Possible Ransomware Activity",
                 description=description,
                 severity=severity,
                 status="OPEN",
@@ -87,49 +80,68 @@ class IncidentManager:
             )
 
             db.add(incident)
-
             db.commit()
-
             db.refresh(incident)
 
             incident_id = incident.id
 
+            # -------------------------------------------------
+            # 2. Create alert database record
+            # -------------------------------------------------
+
+            alert = Alert(
+                severity=severity,
+                message=(
+                    f"Possible ransomware activity detected. "
+                    f"Incident ID: {incident_id}. "
+                    f"Threat score: {score}/100. "
+                    f"Suspect process: "
+                    f"{suspect_process or 'Unknown'}"
+                ),
+                timestamp=datetime.now(),
+            )
+
+            db.add(alert)
+            db.commit()
+            db.refresh(alert)
+
+            alert_id = alert.id
+
         except Exception:
-
             db.rollback()
-
             raise
 
         finally:
-
             db.close()
 
-        # ----------------------------------------
-        # ALERT LOG
-        # ----------------------------------------
+        # -----------------------------------------------------
+        # 3. Write alert log
+        # -----------------------------------------------------
 
         self.alert_logger.warning(
             f"CRITICAL INCIDENT CREATED | "
             f"incident_id={incident_id} | "
+            f"alert_id={alert_id} | "
             f"score={score} | "
             f"severity={severity} | "
             f"suspect_process="
             f"{suspect_process or 'Unknown'}"
         )
 
-        # ----------------------------------------
-        # AUDIT LOG
-        # ----------------------------------------
+        # -----------------------------------------------------
+        # 4. Write audit log
+        # -----------------------------------------------------
 
         self.audit_logger.info(
             f"INCIDENT_CREATED | "
             f"incident_id={incident_id} | "
+            f"alert_id={alert_id} | "
             f"score={score} | "
             f"severity={severity} | "
-            f"affected_files="
-            f"{len(affected_files)} | "
+            f"affected_files={len(affected_files)} | "
             f"suspect_process="
             f"{suspect_process or 'Unknown'}"
         )
 
         return incident_id
+
