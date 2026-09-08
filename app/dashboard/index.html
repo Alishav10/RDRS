@@ -1,0 +1,2215 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>RDRS Security Operations Center</title>
+
+<!-- Bootstrap -->
+<link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+>
+
+<!-- Bootstrap Icons -->
+<link
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    rel="stylesheet"
+>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+    :root {
+        --bg: #080b10;
+        --panel: #0f141b;
+        --panel-2: #121923;
+        --border: #202a36;
+        --text: #e8edf3;
+        --muted: #8995a3;
+        --green: #3ddc97;
+        --yellow: #f5c451;
+        --red: #ff5c6c;
+        --blue: #4da3ff;
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family:
+            Inter,
+            -apple-system,
+            BlinkMacSystemFont,
+            "Segoe UI",
+            sans-serif;
+    }
+
+    .dashboard-container {
+        max-width: 1600px;
+        margin: auto;
+        padding: 24px;
+    }
+
+    /* HEADER */
+
+    .topbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: 22px;
+        margin-bottom: 22px;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .brand {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+    .brand-icon {
+        width: 42px;
+        height: 42px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--panel);
+        color: var(--blue);
+        font-size: 21px;
+    }
+
+    .brand-title {
+        font-size: 20px;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+    }
+
+    .brand-subtitle {
+        color: var(--muted);
+        font-size: 12px;
+        margin-top: 2px;
+    }
+
+    .monitoring-status {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        color: var(--muted);
+        font-size: 13px;
+    }
+
+    .status-dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: var(--green);
+        box-shadow: 0 0 10px rgba(61, 220, 151, 0.5);
+    }
+
+    /* PANELS */
+
+    .panel {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 20px;
+        height: 100%;
+    }
+
+    .panel-title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 18px;
+    }
+
+    .panel-title h5 {
+        margin: 0;
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+    }
+
+    .panel-title span {
+        color: var(--muted);
+        font-size: 11px;
+    }
+
+    /* THREAT */
+
+    .threat-panel {
+        min-height: 300px;
+    }
+
+    .threat-label {
+        color: var(--muted);
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .threat-level {
+        font-size: 40px;
+        font-weight: 800;
+        margin: 12px 0 3px;
+        letter-spacing: -1px;
+    }
+
+    .threat-score {
+        color: var(--muted);
+        font-size: 13px;
+    }
+
+    .score-bar {
+        height: 8px;
+        width: 100%;
+        background: #202832;
+        border-radius: 10px;
+        overflow: hidden;
+        margin: 22px 0;
+    }
+
+    .score-fill {
+        height: 100%;
+        width: 0%;
+        border-radius: 10px;
+        transition:
+            width 0.5s ease,
+            background 0.5s ease;
+    }
+
+    .threat-message {
+        font-size: 13px;
+        color: var(--muted);
+        line-height: 1.6;
+        min-height: 42px;
+    }
+
+    .activity-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 18px;
+        padding: 7px 11px;
+        border-radius: 7px;
+        border: 1px solid var(--border);
+        background: var(--panel-2);
+        font-size: 11px;
+        color: var(--muted);
+    }
+
+    /* METRICS */
+
+    .metric-card {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 18px;
+        height: 100%;
+    }
+
+    .metric-icon {
+        color: var(--blue);
+        font-size: 17px;
+        margin-bottom: 12px;
+    }
+
+    .metric-label {
+        color: var(--muted);
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+    }
+
+    .metric-value {
+        font-size: 25px;
+        font-weight: 700;
+        margin-top: 5px;
+    }
+
+    .metric-description {
+        color: #667382;
+        font-size: 10px;
+        margin-top: 3px;
+    }
+
+    /* CHART */
+
+    .chart-panel {
+        min-height: 330px;
+    }
+
+    .chart-container {
+        height: 245px;
+        position: relative;
+    }
+
+    .empty-chart {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: #667382;
+        text-align: center;
+        pointer-events: none;
+    }
+
+    .empty-chart i {
+        font-size: 28px;
+        margin-bottom: 10px;
+    }
+
+    .empty-chart span {
+        font-size: 12px;
+    }
+
+    /* EVENTS */
+
+    .event-list {
+        max-height: 390px;
+        overflow-y: auto;
+    }
+
+    .event-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 13px;
+        padding: 12px 0;
+        border-bottom: 1px solid #1a222c;
+    }
+
+    .event-item:last-child {
+        border-bottom: none;
+    }
+
+    .event-icon {
+        width: 30px;
+        height: 30px;
+        border-radius: 7px;
+        background: var(--panel-2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--blue);
+        flex-shrink: 0;
+    }
+
+    .event-main {
+        min-width: 0;
+        flex: 1;
+    }
+
+    .event-type {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+    }
+
+    .event-path {
+        color: var(--muted);
+        font-size: 11px;
+        margin-top: 3px;
+        word-break: break-all;
+    }
+
+    .event-time {
+        color: #5e6976;
+        font-size: 10px;
+        white-space: nowrap;
+    }
+
+    /* ALERTS */
+
+    .alert-item {
+        border: 1px solid var(--border);
+        background: var(--panel-2);
+        border-radius: 8px;
+        padding: 12px;
+        margin-bottom: 10px;
+    }
+
+    .alert-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 7px;
+    }
+
+    .severity {
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 0.7px;
+    }
+
+    .severity-critical {
+        color: var(--red);
+    }
+
+    .severity-warning {
+        color: var(--yellow);
+    }
+
+    .severity-low {
+        color: var(--blue);
+    }
+
+    .alert-message {
+        color: var(--muted);
+        font-size: 11px;
+        line-height: 1.5;
+    }
+
+    .alert-time {
+        color: #5e6976;
+        font-size: 10px;
+        margin-top: 7px;
+    }
+
+    /* FILES */
+
+    .file-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 0;
+        border-bottom: 1px solid #1a222c;
+    }
+
+    .file-row:last-child {
+        border-bottom: none;
+    }
+
+    .file-name {
+        flex: 1;
+        min-width: 0;
+        color: var(--muted);
+        font-size: 11px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .file-count {
+        font-size: 12px;
+        font-weight: 700;
+        min-width: 30px;
+        text-align: right;
+    }
+
+    .file-bar {
+        width: 80px;
+        height: 5px;
+        background: #202832;
+        border-radius: 5px;
+        overflow: hidden;
+    }
+
+    .file-bar-fill {
+        height: 100%;
+        background: var(--blue);
+        border-radius: 5px;
+    }
+
+    /* SYSTEM INFO */
+
+    .system-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid #1a222c;
+        font-size: 12px;
+    }
+
+    .system-row:last-child {
+        border-bottom: none;
+    }
+
+    .system-label {
+        color: var(--muted);
+    }
+
+    .system-value {
+        font-weight: 600;
+    }
+
+    /* EMPTY */
+
+    .empty-state {
+        padding: 35px 10px;
+        text-align: center;
+        color: #65717e;
+        font-size: 12px;
+    }
+
+    .empty-state i {
+        font-size: 24px;
+        display: block;
+        margin-bottom: 8px;
+    }
+
+    /* FOOTER */
+
+    .footer {
+        text-align: center;
+        color: #4e5966;
+        font-size: 10px;
+        padding: 22px 0 5px;
+    }
+
+    /* RESPONSIVE */
+
+    @media (max-width: 768px) {
+        .dashboard-container {
+            padding: 14px;
+        }
+
+        .topbar {
+            align-items: flex-start;
+            gap: 15px;
+            flex-direction: column;
+        }
+
+        .threat-level {
+            font-size: 32px;
+        }
+    }
+</style>
+
+
+</head>
+
+<body>
+
+<div class="dashboard-container">
+
+
+<!-- HEADER -->
+
+<div class="topbar">
+
+    <div class="brand">
+
+        <div class="brand-icon">
+            <i class="bi bi-shield-check"></i>
+        </div>
+
+        <div>
+            <div class="brand-title">
+                RDRS Security Operations Center
+            </div>
+
+            <div class="brand-subtitle">
+                Ransomware Detection & Response System
+            </div>
+        </div>
+
+    </div>
+
+    <div class="monitoring-status">
+        <span class="status-dot" id="statusDot"></span>
+        <span id="monitoringText">MONITORING ACTIVE</span>
+        <span>•</span>
+        <span id="lastUpdated">Updating...</span>
+    </div>
+
+</div>
+
+
+<!-- TOP ROW -->
+
+<div class="row g-3 mb-3">
+
+    <!-- THREAT STATUS -->
+
+    <div class="col-lg-4">
+
+        <div class="panel threat-panel">
+
+            <div class="panel-title">
+                <h5>CURRENT SECURITY STATUS</h5>
+                <span>LIVE</span>
+            </div>
+
+            <div class="threat-label">
+                Threat Level
+            </div>
+
+            <div
+                class="threat-level"
+                id="threatLevel"
+            >
+                NORMAL
+            </div>
+
+            <div
+                class="threat-score"
+                id="threatScore"
+            >
+                Threat Score: 0 / 100
+            </div>
+
+            <div class="score-bar">
+                <div
+                    class="score-fill"
+                    id="scoreFill"
+                ></div>
+            </div>
+
+            <div
+                class="threat-message"
+                id="threatMessage"
+            >
+                No active ransomware-like activity detected.
+            </div>
+
+            <div class="activity-badge">
+                <i class="bi bi-activity"></i>
+                <span id="activityStatus">
+                    IDLE
+                </span>
+
+                <span>•</span>
+
+                <span id="activityAge">
+                    Waiting for activity
+                </span>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- METRICS -->
+
+    <div class="col-lg-8">
+
+        <div class="row g-3 h-100">
+
+            <div class="col-md-6 col-xl-3">
+
+                <div class="metric-card">
+
+                    <div class="metric-icon">
+                        <i class="bi bi-file-earmark-text"></i>
+                    </div>
+
+                    <div class="metric-label">
+                        Modifications
+                    </div>
+
+                    <div
+                        class="metric-value"
+                        id="modifications"
+                    >
+                        0
+                    </div>
+
+                    <div class="metric-description">
+                        Last 60 seconds
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-6 col-xl-3">
+
+                <div class="metric-card">
+
+                    <div class="metric-icon">
+                        <i class="bi bi-arrow-repeat"></i>
+                    </div>
+
+                    <div class="metric-label">
+                        Renames
+                    </div>
+
+                    <div
+                        class="metric-value"
+                        id="renames"
+                    >
+                        0
+                    </div>
+
+                    <div class="metric-description">
+                        Last 60 seconds
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-6 col-xl-3">
+
+                <div class="metric-card">
+
+                    <div class="metric-icon">
+                        <i class="bi bi-bar-chart"></i>
+                    </div>
+
+                    <div class="metric-label">
+                        Entropy
+                    </div>
+
+                    <div
+                        class="metric-value"
+                        id="entropy"
+                    >
+                        0.000
+                    </div>
+
+                    <div class="metric-description">
+                        Average file entropy
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-6 col-xl-3">
+
+                <div class="metric-card">
+
+                    <div class="metric-icon">
+                        <i class="bi bi-cpu"></i>
+                    </div>
+
+                    <div class="metric-label">
+                        CPU
+                    </div>
+
+                    <div
+                        class="metric-value"
+                        id="cpu"
+                    >
+                        0%
+                    </div>
+
+                    <div class="metric-description">
+                        Recent average
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-12">
+
+                <div class="panel">
+
+                    <div class="panel-title">
+                        <h5>MONITORING STATISTICS</h5>
+                        <span>DATABASE</span>
+                    </div>
+
+                    <div class="row">
+
+                        <div class="col-6 col-md-3">
+                            <div class="system-row">
+                                <span class="system-label">
+                                    Events
+                                </span>
+
+                                <span
+                                    class="system-value"
+                                    id="totalEvents"
+                                >
+                                    0
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-md-3">
+                            <div class="system-row">
+                                <span class="system-label">
+                                    Processes
+                                </span>
+
+                                <span
+                                    class="system-value"
+                                    id="totalProcesses"
+                                >
+                                    0
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-md-3">
+                            <div class="system-row">
+                                <span class="system-label">
+                                    Alerts
+                                </span>
+
+                                <span
+                                    class="system-value"
+                                    id="totalAlerts"
+                                >
+                                    0
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-md-3">
+                            <div class="system-row">
+                                <span class="system-label">
+                                    Incidents
+                                </span>
+
+                                <span
+                                    class="system-value"
+                                    id="totalIncidents"
+                                >
+                                    0
+                                </span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- CHARTS -->
+
+<div class="row g-3 mb-3">
+
+    <div class="col-lg-6">
+
+        <div class="panel chart-panel">
+
+            <div class="panel-title">
+
+                <h5>THREAT ACTIVITY</h5>
+
+                <span>
+                    LAST 60 SECONDS
+                </span>
+
+            </div>
+
+            <div class="chart-container">
+
+                <canvas id="threatChart"></canvas>
+
+                <div
+                    class="empty-chart"
+                    id="threatEmpty"
+                >
+                    <i class="bi bi-graph-up"></i>
+
+                    <span>
+                        Waiting for live security activity...
+                    </span>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="col-lg-6">
+
+        <div class="panel chart-panel">
+
+            <div class="panel-title">
+
+                <h5>FILE ACTIVITY</h5>
+
+                <span>
+                    EVENTS / 75 SEC
+                </span>
+
+            </div>
+
+            <div class="chart-container">
+
+                <canvas id="activityChart"></canvas>
+
+                <div
+                    class="empty-chart"
+                    id="activityEmpty"
+                >
+                    <i class="bi bi-bar-chart"></i>
+
+                    <span>
+                        Waiting for file activity...
+                    </span>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- CPU -->
+
+<div class="row g-3 mb-3">
+
+    <div class="col-lg-8">
+
+        <div class="panel chart-panel">
+
+            <div class="panel-title">
+
+                <h5>CPU ACTIVITY</h5>
+
+                <span>
+                    LAST 60 SECONDS
+                </span>
+
+            </div>
+
+            <div class="chart-container">
+
+                <canvas id="cpuChart"></canvas>
+
+                <div
+                    class="empty-chart"
+                    id="cpuEmpty"
+                >
+                    <i class="bi bi-cpu"></i>
+
+                    <span>
+                        Waiting for process telemetry...
+                    </span>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- TOP MODIFIED -->
+
+    <div class="col-lg-4">
+
+        <div class="panel">
+
+            <div class="panel-title">
+
+                <h5>TOP MODIFIED FILES</h5>
+
+                <span>
+                    CURRENT WINDOW
+                </span>
+
+            </div>
+
+            <div id="topFiles">
+
+                <div class="empty-state">
+
+                    <i class="bi bi-file-earmark"></i>
+
+                    No recent file activity
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- EVENTS + ALERTS -->
+
+<div class="row g-3 mb-3">
+
+    <!-- EVENTS -->
+
+    <div class="col-lg-7">
+
+        <div class="panel">
+
+            <div class="panel-title">
+
+                <h5>RECENT SECURITY EVENTS</h5>
+
+                <span>
+                    LIVE EVENT STREAM
+                </span>
+
+            </div>
+
+            <div
+                class="event-list"
+                id="eventList"
+            >
+
+                <div class="empty-state">
+
+                    <i class="bi bi-clock-history"></i>
+
+                    Waiting for security events...
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ALERTS -->
+
+    <div class="col-lg-5">
+
+        <div class="panel">
+
+            <div class="panel-title">
+
+                <h5>RECENT ALERTS</h5>
+
+                <span>
+                    HISTORICAL
+                </span>
+
+            </div>
+
+            <div id="alertList">
+
+                <div class="empty-state">
+
+                    <i class="bi bi-shield-check"></i>
+
+                    No alerts recorded
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<div class="footer">
+    <!-- INCIDENT REPORTS -->
+
+    <div class="row mt-4">
+
+        <div class="col-12">
+
+            <div class="panel">
+
+                <div class="panel-title">
+
+                    <h5>INCIDENT REPORTS</h5>
+
+                    <span>
+                        REPORTING
+                    </span>
+
+                </div>
+
+                <div id="incidentReportList">
+
+                    <div class="empty-state">
+
+                        <i class="bi bi-file-earmark-text"></i>
+
+                        No incidents available
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+    RDRS v1.0.0 • Defensive monitoring system • Simulation mode
+</div>
+
+
+</div>
+
+<script>
+
+    let threatChart;
+    let activityChart;
+    let cpuChart;
+
+
+    /* ---------------------------------------------------------
+       HELPERS
+    --------------------------------------------------------- */
+
+    function escapeHtml(value) {
+
+        if (value === null || value === undefined) {
+            return "";
+        }
+
+        return String(value)
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;")
+            .replaceAll("'", "&#039;");
+    }
+
+
+    function formatDateTime(timestamp) {
+
+        if (!timestamp) {
+            return "--";
+        }
+
+        const date = new Date(timestamp);
+
+        return date.toLocaleString(
+            [],
+            {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit"
+            }
+        );
+        }
+
+
+    function severityClass(severity) {
+
+        const value = String(
+            severity || ""
+        ).toUpperCase();
+
+        if (value === "CRITICAL") {
+            return "severity-critical";
+        }
+
+        if (value === "WARNING") {
+            return "severity-warning";
+        }
+
+        return "severity-low";
+    }
+
+
+    function eventIcon(eventType) {
+
+        switch (
+            String(eventType || "").toUpperCase()
+        ) {
+
+            case "MODIFY":
+                return "bi-pencil-square";
+
+            case "RENAME":
+                return "bi-arrow-repeat";
+
+            case "CREATE":
+                return "bi-file-earmark-plus";
+
+            case "DELETE":
+                return "bi-trash";
+
+            default:
+                return "bi-file-earmark";
+        }
+    }
+
+
+    /* ---------------------------------------------------------
+       THREAT COLORS
+    --------------------------------------------------------- */
+
+    function updateThreatAppearance(
+        level,
+        score
+    ) {
+
+        const threatLevel =
+            document.getElementById(
+                "threatLevel"
+            );
+
+        const scoreFill =
+            document.getElementById(
+                "scoreFill"
+            );
+
+        const levelUpper =
+            String(level || "NORMAL")
+                .toUpperCase();
+
+        threatLevel.textContent =
+            levelUpper;
+
+        scoreFill.style.width =
+            `${score}%`;
+
+        if (levelUpper === "CRITICAL") {
+
+            threatLevel.style.color =
+                "var(--red)";
+
+            scoreFill.style.background =
+                "var(--red)";
+
+        } else if (levelUpper === "WARNING") {
+
+            threatLevel.style.color =
+                "var(--yellow)";
+
+            scoreFill.style.background =
+                "var(--yellow)";
+
+        } else if (levelUpper === "LOW") {
+
+            threatLevel.style.color =
+                "var(--blue)";
+
+            scoreFill.style.background =
+                "var(--blue)";
+
+        } else {
+
+            threatLevel.style.color =
+                "var(--green)";
+
+            scoreFill.style.background =
+                "var(--green)";
+        }
+    }
+
+
+    /* ---------------------------------------------------------
+       CHART CONFIG
+    --------------------------------------------------------- */
+
+    const chartOptions = {
+
+        responsive: true,
+
+        maintainAspectRatio: false,
+
+        animation: false,
+
+        interaction: {
+            intersect: false,
+            mode: "index"
+        },
+
+        plugins: {
+
+            legend: {
+                display: true,
+
+                labels: {
+                    color: "#8995a3",
+                    boxWidth: 10,
+                    font: {
+                        size: 10
+                    }
+                }
+            }
+
+        },
+
+        scales: {
+
+            x: {
+
+                ticks: {
+                    color: "#687482",
+                    font: {
+                        size: 9
+                    },
+                    maxTicksLimit: 7
+                },
+
+                grid: {
+                    color: "#1a222c"
+                }
+
+            },
+
+            y: {
+
+                beginAtZero: true,
+
+                ticks: {
+                    color: "#687482",
+                    font: {
+                        size: 9
+                    }
+                },
+
+                grid: {
+                    color: "#1a222c"
+                }
+
+            }
+
+        }
+
+    };
+
+
+    function initializeCharts() {
+
+        threatChart =
+            new Chart(
+                document.getElementById(
+                    "threatChart"
+                ),
+                {
+                    type: "line",
+
+                    data: {
+                        labels: [],
+
+                        datasets: [
+                            {
+                                label: "Threat Score",
+
+                                data: [],
+
+                                borderColor: "#ff5c6c",
+
+                                backgroundColor:
+                                    "rgba(255,92,108,0.08)",
+
+                                borderWidth: 2,
+
+                                fill: true,
+
+                                tension: 0.35,
+
+                                pointRadius: 2,
+
+                                pointHoverRadius: 5
+                            }
+                        ]
+                    },
+
+                    options: {
+                        ...chartOptions,
+
+                        scales: {
+
+                            ...chartOptions.scales,
+
+                            y: {
+                                ...chartOptions.scales.y,
+                                min: 0,
+                                max: 100
+                            }
+
+                        }
+                    }
+                }
+            );
+
+
+        activityChart =
+            new Chart(
+                document.getElementById(
+                    "activityChart"
+                ),
+                {
+                    type: "bar",
+
+                    data: {
+                        labels: [],
+
+                        datasets: [
+                            {
+                                label: "Modifications",
+
+                                data: [],
+
+                                backgroundColor:
+                                    "#4da3ff",
+
+                                borderRadius: 3
+                            },
+
+                            {
+                                label: "Renames",
+
+                                data: [],
+
+                                backgroundColor:
+                                    "#f5c451",
+
+                                borderRadius: 3
+                            }
+                        ]
+                    },
+
+                    options: chartOptions
+                }
+            );
+
+
+        cpuChart =
+            new Chart(
+                document.getElementById(
+                    "cpuChart"
+                ),
+                {
+                    type: "line",
+
+                    data: {
+                        labels: [],
+
+                        datasets: [
+                            {
+                                label: "CPU %",
+
+                                data: [],
+
+                                borderColor: "#3ddc97",
+
+                                backgroundColor:
+                                    "rgba(61,220,151,0.07)",
+
+                                borderWidth: 2,
+
+                                fill: true,
+
+                                tension: 0.35,
+
+                                pointRadius: 2,
+
+                                pointHoverRadius: 5
+                            }
+                        ]
+                    },
+
+                    options: chartOptions
+                }
+            );
+    }
+
+
+    /* ---------------------------------------------------------
+       UPDATE CHARTS
+    --------------------------------------------------------- */
+
+    function updateCharts(data) {
+
+        const activity =
+            data.charts?.activity || [];
+
+        const cpu =
+            data.charts?.cpu || [];
+
+
+        /* THREAT */
+
+        threatChart.data.labels =
+            activity.map(
+                item => item.time
+            );
+
+        threatChart.data.datasets[0].data =
+            activity.map(
+                item => item.score
+            );
+
+        threatChart.update();
+
+
+        document.getElementById(
+            "threatEmpty"
+        ).style.display =
+            activity.length
+                ? "none"
+                : "flex";
+
+
+        /* ACTIVITY */
+
+        activityChart.data.labels =
+            activity.map(
+                item => item.time
+            );
+
+        activityChart.data.datasets[0].data =
+            activity.map(
+                item => item.modifications
+            );
+
+        activityChart.data.datasets[1].data =
+            activity.map(
+                item => item.renames
+            );
+
+        activityChart.update();
+
+
+        document.getElementById(
+            "activityEmpty"
+        ).style.display =
+            activity.length
+                ? "none"
+                : "flex";
+
+
+        /* CPU */
+
+        cpuChart.data.labels =
+            cpu.map(
+                item => item.time
+            );
+
+        cpuChart.data.datasets[0].data =
+            cpu.map(
+                item => item.cpu
+            );
+
+        cpuChart.update();
+
+
+        document.getElementById(
+            "cpuEmpty"
+        ).style.display =
+            cpu.length
+                ? "none"
+                : "flex";
+    }
+
+
+    /* ---------------------------------------------------------
+       TOP FILES
+    --------------------------------------------------------- */
+
+    function updateTopFiles(files) {
+
+        const container =
+            document.getElementById(
+                "topFiles"
+            );
+
+        if (!files || !files.length) {
+
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="bi bi-file-earmark"></i>
+                    No recent file activity
+                </div>
+            `;
+
+            return;
+        }
+
+
+        const maximum =
+            Math.max(
+                ...files.map(
+                    file => file.count
+                )
+            );
+
+
+        container.innerHTML =
+            files.map(
+                file => {
+
+                    const percentage =
+                        maximum > 0
+                            ? (
+                                file.count /
+                                maximum
+                            ) * 100
+                            : 0;
+
+                    return `
+                        <div class="file-row">
+
+                            <i class="bi bi-file-earmark-text text-secondary"></i>
+
+                            <div class="file-name"
+                                 title="${escapeHtml(file.file)}">
+
+                                ${escapeHtml(file.file)}
+
+                            </div>
+
+                            <div class="file-bar">
+
+                                <div
+                                    class="file-bar-fill"
+                                    style="width:${percentage}%"
+                                ></div>
+
+                            </div>
+
+                            <div class="file-count">
+                                ${file.count}
+                            </div>
+
+                        </div>
+                    `;
+                }
+            )
+            .join("");
+    }
+
+
+    /* ---------------------------------------------------------
+       EVENTS
+    --------------------------------------------------------- */
+
+    function updateEvents(events) {
+
+        const container =
+            document.getElementById(
+                "eventList"
+            );
+
+        if (!events || !events.length) {
+
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="bi bi-clock-history"></i>
+                    No recent security events
+                </div>
+            `;
+
+            return;
+        }
+
+
+        container.innerHTML =
+            events.map(
+                event => {
+
+                    const type =
+                        String(
+                            event.event_type || ""
+                        ).toUpperCase();
+
+                    return `
+                        <div class="event-item">
+
+                            <div class="event-icon">
+
+                                <i class="bi ${
+                                    eventIcon(type)
+                                }"></i>
+
+                            </div>
+
+                            <div class="event-main">
+
+                                <div class="event-type">
+                                    ${escapeHtml(type)}
+                                </div>
+
+                                <div
+                                    class="event-path"
+                                    title="${escapeHtml(event.file_path)}"
+                                >
+                                    ${escapeHtml(event.file_path)}
+                                </div>
+
+                            </div>
+
+                            <div class="event-time">
+                                ${formatDateTime(event.timestamp)}
+                            </div>
+
+                        </div>
+                    `;
+                }
+            )
+            .join("");
+    }
+
+
+    /* ---------------------------------------------------------
+       ALERTS
+    --------------------------------------------------------- */
+
+    function updateAlerts(alerts) {
+
+        const container =
+            document.getElementById(
+                "alertList"
+            );
+
+        if (!alerts || !alerts.length) {
+
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="bi bi-shield-check"></i>
+                    No alerts recorded
+                </div>
+            `;
+
+            return;
+        }
+
+
+        container.innerHTML =
+            alerts.map(
+                alert => {
+
+                    const severity =
+                        String(
+                            alert.severity || "LOW"
+                        ).toUpperCase();
+
+                    return `
+                        <div class="alert-item">
+
+                            <div class="alert-header">
+
+                                <span class="severity ${
+                                    severityClass(severity)
+                                }">
+
+                                    ${escapeHtml(severity)}
+
+                                </span>
+
+                                <span class="event-time">
+                                    #${escapeHtml(alert.id)}
+                                </span>
+
+                            </div>
+
+                            <div class="alert-message">
+
+                                ${escapeHtml(alert.message)}
+
+                            </div>
+
+                            <div class="alert-time">
+
+                                ${formatDateTime(alert.timestamp)}
+
+                            </div>
+
+                        </div>
+                    `;
+                }
+            )
+            .join("");
+    }
+
+    /* ---------------------------------------------------------
+    INCIDENT REPORTS
+    --------------------------------------------------------- */
+
+    function updateIncidentReports(incidents) {
+
+        const container =
+            document.getElementById(
+                "incidentReportList"
+            );
+
+        if (!incidents || !incidents.length) {
+
+            container.innerHTML = `
+                <div class="empty-state">
+
+                    <i class="bi bi-file-earmark-text"></i>
+
+                    No incidents available
+
+                </div>
+            `;
+
+            return;
+        }
+
+        container.innerHTML =
+            incidents.map(
+                incident => {
+
+                    const severity =
+                        String(
+                            incident.severity || "LOW"
+                        ).toUpperCase();
+
+                    return `
+                        <div class="alert-item">
+
+                            <div class="alert-header">
+
+                                <span class="severity ${
+                                    severityClass(severity)
+                                }">
+
+                                    ${escapeHtml(severity)}
+
+                                </span>
+
+                                <span class="event-time">
+
+                                    Incident #${escapeHtml(
+                                        incident.id
+                                    )}
+
+                                </span>
+
+                            </div>
+
+                            <div class="alert-message">
+
+                                ${escapeHtml(
+                                    incident.title ||
+                                    "Security Incident"
+                                )}
+
+                            </div>
+
+                            <div class="alert-time">
+
+                                ${formatDateTime(
+                                    incident.timestamp
+                                )}
+
+                            </div>
+
+                            <div style="
+                                margin-top: 12px;
+                                display: flex;
+                                gap: 8px;
+                                flex-wrap: wrap;
+                            ">
+
+                                <button
+                                    class="btn btn-sm btn-outline-light"
+                                    onclick="generateReport(
+                                        ${incident.id}
+                                    )"
+                                >
+
+                                    <i class="bi bi-file-earmark-code"></i>
+
+                                    Generate HTML
+
+                                </button>
+
+                                <button
+                                    class="btn btn-sm btn-outline-info"
+                                    onclick="openReport(
+                                        ${incident.id}
+                                    )"
+                                >
+
+                                    <i class="bi bi-box-arrow-up-right"></i>
+
+                                    View Report
+
+                                </button>
+
+                            </div>
+
+                        </div>
+                    `;
+                }
+            )
+            .join("");
+    }
+
+    async function generateReport(incidentId) {
+
+        try {
+
+            const response =
+                await fetch(
+                    `/reports/${incidentId}/generate`,
+                    {
+                        method: "POST"
+                    }
+                );
+
+            if (!response.ok) {
+
+                throw new Error(
+                    `HTTP ${response.status}`
+                );
+
+            }
+
+            const data =
+                await response.json();
+
+            console.log(
+                "Report generated:",
+                data
+            );
+
+            alert(
+                `Report generated successfully for Incident #${incidentId}`
+            );
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Report generation error:",
+                error
+            );
+
+            alert(
+                "Unable to generate the incident report."
+            );
+
+        }
+    }
+
+    function openReport(incidentId) {
+
+        window.open(
+            `/reports/${incidentId}/html`,
+            "_blank"
+        );
+
+    }
+    /* ---------------------------------------------------------
+       MAIN DASHBOARD UPDATE
+    --------------------------------------------------------- */
+
+    async function loadDashboard() {
+
+        try {
+
+            const response =
+                await fetch(
+                    "/dashboard/data",
+                    {
+                        cache: "no-store"
+                    }
+                );
+
+
+            if (!response.ok) {
+                throw new Error(
+                    `HTTP ${response.status}`
+                );
+            }
+
+
+            const data =
+                await response.json();
+
+
+            /* THREAT */
+
+            const threat =
+                data.threat || {};
+
+            const score =
+                Number(
+                    threat.score || 0
+                );
+
+            updateThreatAppearance(
+                threat.level,
+                score
+            );
+
+            updateIncidentReports(
+                    data.recent_incidents || []
+                );
+
+            document.getElementById(
+                "threatScore"
+            ).textContent =
+                `Threat Score: ${score} / 100`;
+
+
+            const reasons =
+                threat.reasons || [];
+
+
+            if (
+                String(threat.level)
+                    .toUpperCase() ===
+                "CRITICAL"
+            ) {
+
+                document.getElementById(
+                    "threatMessage"
+                ).textContent =
+                    reasons.length
+                        ? reasons.join(" • ")
+                        : "Critical ransomware-like activity detected.";
+
+            } else if (
+                String(threat.level)
+                    .toUpperCase() ===
+                "WARNING"
+            ) {
+
+                document.getElementById(
+                    "threatMessage"
+                ).textContent =
+                    reasons.length
+                        ? reasons.join(" • ")
+                        : "Suspicious activity requires attention.";
+
+            } else if (
+                String(threat.level)
+                    .toUpperCase() ===
+                "LOW"
+            ) {
+
+                document.getElementById(
+                    "threatMessage"
+                ).textContent =
+                    reasons.length
+                        ? reasons.join(" • ")
+                        : "Minor security activity detected.";
+
+            } else {
+
+                document.getElementById(
+                    "threatMessage"
+                ).textContent =
+                    "No active ransomware-like activity detected.";
+            }
+
+
+            document.getElementById(
+                "activityStatus"
+            ).textContent =
+                threat.activity_status ||
+                "IDLE";
+
+
+            if (
+                threat.seconds_since_activity ===
+                null ||
+                threat.seconds_since_activity ===
+                undefined
+            ) {
+
+                document.getElementById(
+                    "activityAge"
+                ).textContent =
+                    "No activity recorded";
+
+            } else if (
+                threat.seconds_since_activity <= 5
+            ) {
+
+                document.getElementById(
+                    "activityAge"
+                ).textContent =
+                    "Activity detected just now";
+
+            } else {
+
+                document.getElementById(
+                    "activityAge"
+                ).textContent =
+                    `${threat.seconds_since_activity}s since activity`;
+            }
+
+
+            /* LIVE ACTIVITY */
+
+            const live =
+                data.live_activity || {};
+
+
+            document.getElementById(
+                "modifications"
+            ).textContent =
+                live.modifications || 0;
+
+
+            document.getElementById(
+                "renames"
+            ).textContent =
+                live.renames || 0;
+
+
+            document.getElementById(
+                "entropy"
+            ).textContent =
+                Number(
+                    live.average_entropy || 0
+                ).toFixed(3);
+
+
+            /* CPU */
+
+            const cpuData =
+                data.charts?.cpu || [];
+
+
+            if (cpuData.length) {
+
+                const latestCPU =
+                    cpuData[
+                        cpuData.length - 1
+                    ].cpu;
+
+                document.getElementById(
+                    "cpu"
+                ).textContent =
+                    `${Number(
+                        latestCPU
+                    ).toFixed(1)}%`;
+
+            } else {
+
+                document.getElementById(
+                    "cpu"
+                ).textContent =
+                    "0%";
+            }
+
+
+            /* STATISTICS */
+
+            const stats =
+                data.statistics || {};
+
+
+            document.getElementById(
+                "totalEvents"
+            ).textContent =
+                stats.events || 0;
+
+
+            document.getElementById(
+                "totalProcesses"
+            ).textContent =
+                stats.process_snapshots || 0;
+
+
+            document.getElementById(
+                "totalAlerts"
+            ).textContent =
+                stats.alerts || 0;
+
+
+            document.getElementById(
+                "totalIncidents"
+            ).textContent =
+                stats.incidents || 0;
+
+
+            /* OTHER SECTIONS */
+
+            updateCharts(data);
+
+            updateTopFiles(
+                data.top_modified_files || []
+            );
+
+            updateEvents(
+                data.recent_events || []
+            );
+
+            updateAlerts(
+                data.recent_alerts || []
+            );
+
+
+            /* UPDATED TIME */
+
+            document.getElementById(
+                "lastUpdated"
+            ).textContent =
+                `Updated ${formatDateTime(
+                   data.timestamp
+                )}`;
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Dashboard error:",
+                error
+            );
+
+
+            document.getElementById(
+                "monitoringText"
+            ).textContent =
+                "CONNECTION ERROR";
+
+
+            document.getElementById(
+                "statusDot"
+            ).style.background =
+                "var(--red)";
+
+        }
+
+    }
+
+
+    /* ---------------------------------------------------------
+       START
+    --------------------------------------------------------- */
+
+    initializeCharts();
+
+    loadDashboard();
+
+
+    /*
+       Refresh every 3 seconds.
+
+       This makes the dashboard behave like a live
+       monitoring console rather than a static report.
+    */
+
+    setInterval(
+        loadDashboard,
+        3000
+    );
+
+</script>
+
+</body>
+</html>

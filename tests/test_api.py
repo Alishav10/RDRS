@@ -110,3 +110,23 @@ def test_settings_invalid_entropy():
 
     assert response.status_code == 422
 
+def test_dashboard():
+    response = client.get("/dashboard")
+
+    assert response.status_code == 200
+    assert "text/html" in response.headers["content-type"]
+
+
+def test_dashboard_data():
+    response = client.get("/dashboard/data")
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert "threat" in data
+    assert "statistics" in data
+    assert "recent_alerts" in data
+    assert "recent_events" in data
+    assert "top_modified_files" in data
+    assert "charts" in data

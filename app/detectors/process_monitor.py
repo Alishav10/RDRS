@@ -19,29 +19,78 @@ class ProcessMonitor:
     def collect_snapshot(self):
         """
         Collect information about all currently running processes.
+
+        CPU usage is measured using two non-blocking psutil
+        measurements separated by a short interval. This avoids
+        the common problem where the first cpu_percent() reading
+        is always 0.0.
         """
 
         processes = []
+
+        # ---------------------------------------------------------
+        # 1. GET CURRENT PROCESSES
+        # ---------------------------------------------------------
+
+        process_objects = []
 
         for process in psutil.process_iter(
             [
                 "pid",
                 "name",
-                "cpu_percent",
                 "memory_percent",
                 "exe",
                 "ppid",
             ]
         ):
             try:
+                # First CPU measurement establishes the baseline.
+                process.cpu_percent(interval=None)
+
+                process_objects.append(process)
+
+            except (
+                psutil.NoSuchProcess,
+                psutil.AccessDenied,
+                psutil.ZombieProcess,
+            ):
+                continue
+
+        # ---------------------------------------------------------
+        # 2. SHORT CPU MEASUREMENT INTERVAL
+        # ---------------------------------------------------------
+
+        time.sleep(0.1)
+
+        # ---------------------------------------------------------
+        # 3. COLLECT PROCESS INFORMATION
+        # ---------------------------------------------------------
+
+        for process in process_objects:
+
+            try:
                 info = process.info
 
-                # Get parent process name
+                # Second CPU measurement gives us the CPU usage
+                # since the baseline measurement.
+                cpu_percent = process.cpu_percent(
+                    interval=None
+                )
+
+                # -------------------------------------------------
+                # Parent process
+                # -------------------------------------------------
+
                 parent_name = ""
 
                 try:
-                    parent = psutil.Process(info["ppid"])
-                    parent_name = parent.name()
+                    parent_pid = info["ppid"]
+
+                    if parent_pid:
+                        parent = psutil.Process(parent_pid)
+                        parent_name = parent.name()
+                    else:
+                        parent_name = "Unknown"
 
                 except (
                     psutil.NoSuchProcess,
@@ -50,7 +99,10 @@ class ProcessMonitor:
                 ):
                     parent_name = "Unknown"
 
-                # Get disk write information
+                # -------------------------------------------------
+                # Disk write information
+                # -------------------------------------------------
+
                 disk_writes = 0
 
                 try:
@@ -66,15 +118,33 @@ class ProcessMonitor:
                 ):
                     disk_writes = 0
 
+                # -------------------------------------------------
+                # Build process snapshot
+                # -------------------------------------------------
+
                 process_data = {
                     "pid": info["pid"],
                     "name": info["name"] or "Unknown",
-                    "cpu_percent": info["cpu_percent"] or 0.0,
-                    "memory_percent": info["memory_percent"] or 0.0,
+
+                    "cpu_percent": round(
+                        cpu_percent,
+                        2
+                    ),
+
+                    "memory_percent": (
+                        info["memory_percent"] or 0.0
+                    ),
+
                     "disk_writes": disk_writes,
-                    "executable_path": info["exe"] or "Unknown",
+
+                    "executable_path": (
+                        info["exe"] or "Unknown"
+                    ),
+
                     "parent_pid": info["ppid"],
+
                     "parent_name": parent_name,
+
                     "timestamp": datetime.now(),
                 }
 
@@ -85,8 +155,7 @@ class ProcessMonitor:
                 psutil.AccessDenied,
                 psutil.ZombieProcess,
             ):
-                # Process may disappear or be protected
-                # while information is being collected.
+                # Process may disappear between measurements.
                 continue
 
         self.snapshot_count += 1
