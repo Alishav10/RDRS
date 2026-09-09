@@ -1,4 +1,0 @@
-Incident ID,Severity,Status,Threat Score,Suspect Process,Event Timestamp,Event Type,File Path,Extension,Old Path
-32,CRITICAL,OPEN,95.0,safe-test-process,2026-09-09T12:52:12.524141,MODIFY,data/sandbox/test1.txt,.txt,
-32,CRITICAL,OPEN,95.0,safe-test-process,2026-09-09T12:52:12.862656,RENAME,data/sandbox/test2.demo,.demo,data/sandbox/test2.txt
-32,CRITICAL,OPEN,95.0,safe-test-process,2026-09-09T12:52:24.828832,MODIFY,data/sandbox/test1.txt,.txt,

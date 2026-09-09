@@ -1,2 +1,0 @@
-Incident ID,Severity,Status,Threat Score,Suspect Process,Event Timestamp,Event Type,File Path,Extension,Old Path
-27,CRITICAL,OPEN,95.0,safe-test-process,2026-09-07T11:07:30.667464,AFFECTED_FILE,C:\Users\PC\AppData\Local\Temp\pytest-of-PC\pytest-17\test_critical_detection_trigge0\safe_evidence.txt,.txt,
