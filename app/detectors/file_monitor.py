@@ -6,6 +6,8 @@ import time
 
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
+from watchdog.observers.polling import PollingObserver
+import os
 
 from app.core.config import config
 from app.core.logging_config import get_event_logger
@@ -277,7 +279,12 @@ class FileMonitor:
 
     def __init__(self):
 
-        self.observer = Observer()
+        if os.getenv("RDRS_DOCKER") == "1":
+            self.observer = PollingObserver(timeout=1)
+            print("File monitoring mode: POLLING (Docker)")
+        else:
+            self.observer = Observer()
+            print("File monitoring mode: NATIVE")
 
         self.handler = RDRSEventHandler()
 
