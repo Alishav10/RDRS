@@ -1,0 +1,2 @@
+Incident ID,Severity,Status,Threat Score,Suspect Process,Event Timestamp,Event Type,File Path,Extension,Old Path
+5,CRITICAL,OPEN,95.0,safe-test-process,2026-09-09T12:54:32.239972,MODIFY,data/sandbox/test1.txt,.txt,

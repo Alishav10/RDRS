@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <title>RDRS Incident Report - Incident 13</title>
+
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f4f6f8;
+            margin: 0;
+            padding: 30px;
+            color: #1f2937;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: auto;
+            background: white;
+            padding: 35px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        .header {
+            border-bottom: 3px solid #1f2937;
+            padding-bottom: 20px;
+            margin-bottom: 25px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 30px;
+        }
+
+        .header p {
+            color: #6b7280;
+            margin-bottom: 0;
+        }
+
+        .critical {
+            color: #b91c1c;
+            font-weight: bold;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .info-box {
+            background: #f8fafc;
+            border: 1px solid #e5e7eb;
+            padding: 18px;
+            border-radius: 8px;
+        }
+
+        .info-box .label {
+            font-size: 12px;
+            color: #6b7280;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .info-box .value {
+            font-size: 17px;
+            font-weight: bold;
+        }
+
+        .score-section {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .score {
+            font-size: 42px;
+            font-weight: bold;
+            color: #b91c1c;
+        }
+
+        section {
+            margin-top: 30px;
+        }
+
+        section h2 {
+            font-size: 20px;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 10px;
+        }
+
+        .description {
+            background: #f8fafc;
+            padding: 18px;
+            border-radius: 8px;
+            white-space: pre-line;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th,
+        td {
+            border: 1px solid #e5e7eb;
+            padding: 10px;
+            text-align: left;
+            font-size: 13px;
+        }
+
+        th {
+            background: #f3f4f6;
+        }
+
+        .file {
+            background: #f8fafc;
+            padding: 12px;
+            margin: 8px 0;
+            border-left: 4px solid #b91c1c;
+            word-break: break-all;
+            font-family: Consolas, monospace;
+            font-size: 13px;
+        }
+
+        .recommendation {
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .footer {
+            margin-top: 40px;
+            padding-top: 15px;
+            border-top: 1px solid #e5e7eb;
+            color: #6b7280;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        @media (max-width: 800px) {
+            .info-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- HEADER -->
+
+    <div class="header">
+
+        <h1>RDRS Incident Report</h1>
+
+        <p>
+            Ransomware Detection and Response System
+        </p>
+
+        <p>
+            Incident #13
+        </p>
+
+    </div>
+
+
+    <!-- INCIDENT INFORMATION -->
+
+    <div class="info-grid">
+
+        <div class="info-box">
+
+            <div class="label">
+                Severity
+            </div>
+
+            <div class="value critical">
+                CRITICAL
+            </div>
+
+        </div>
+
+
+        <div class="info-box">
+
+            <div class="label">
+                Status
+            </div>
+
+            <div class="value">
+                OPEN
+            </div>
+
+        </div>
+
+
+        <div class="info-box">
+
+            <div class="label">
+                Incident Date
+            </div>
+
+            <div class="value">
+                09 September 2026
+            </div>
+
+        </div>
+
+
+        <div class="info-box">
+
+            <div class="label">
+                Incident Time
+            </div>
+
+            <div class="value">
+                12:47:12 PM
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- THREAT SCORE -->
+
+    <div class="score-section">
+
+        <h2>
+            Threat Assessment
+        </h2>
+
+        <div class="score">
+            95.0/100
+        </div>
+
+        <p>
+            Threat Level:
+            <strong class="critical">
+                CRITICAL
+            </strong>
+        </p>
+
+    </div>
+
+
+    <!-- INCIDENT DETAILS -->
+
+    <section>
+
+        <h2>
+            Incident Details
+        </h2>
+
+        <div class="description">
+            RDRS detected suspicious file activity.
+
+Classification: POSSIBLE_RANSOMWARE
+Classification Summary: Multiple strong ransomware-like indicators were detected simultaneously.
+
+Threat score: 95
+Suspect process: safe-test-process
+
+Affected files:
+- data/sandbox/test1.txt
+- data/sandbox/test2.txt
+
+        </div>
+
+    </section>
+
+
+    <!-- SUSPECT PROCESS -->
+
+    <section>
+
+        <h2>
+            Suspect Process
+        </h2>
+
+        <div class="file">
+            safe-test-process
+        </div>
+
+    </section>
+
+
+    <!-- AFFECTED FILES -->
+
+    <section>
+
+        <h2>
+            Affected Files
+        </h2>
+
+        
+
+            
+
+                <div class="file">
+                    data/sandbox/test1.txt
+                </div>
+
+            
+
+                <div class="file">
+                    data/sandbox/test2.txt
+                </div>
+
+            
+
+        
+
+    </section>
+
+
+    <!-- TIMELINE -->
+
+    <section>
+
+        <h2>
+            Event Timeline
+        </h2>
+
+        
+
+        <table>
+
+            <thead>
+
+                <tr>
+                    <th>Date & Time</th>
+                    <th>Event</th>
+                    <th>File</th>
+                    <th>Extension</th>
+                    <th>Old Path</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                
+
+                <tr>
+
+                    <td>
+                        2026-09-09T12:47:12.556863
+                    </td>
+
+                    <td>
+                        RENAME
+                    </td>
+
+                    <td>
+                        data/sandbox/test2.demo
+                    </td>
+
+                    <td>
+                        .demo
+                    </td>
+
+                    <td>
+                        data/sandbox/test2.txt
+                    </td>
+
+                </tr>
+
+                
+
+            </tbody>
+
+        </table>
+
+        
+
+    </section>
+
+
+    <!-- RECOMMENDATIONS -->
+
+    <section>
+
+        <h2>
+            Recommended Actions
+        </h2>
+
+        
+
+            <div class="recommendation">
+                • Isolate the suspected endpoint from the network.
+            </div>
+
+        
+
+            <div class="recommendation">
+                • Preserve original evidence for investigation.
+            </div>
+
+        
+
+            <div class="recommendation">
+                • Review the suspect process and its parent process.
+            </div>
+
+        
+
+            <div class="recommendation">
+                • Review recent file modification and rename activity.
+            </div>
+
+        
+
+            <div class="recommendation">
+                • Check authentication and system logs for related activity.
+            </div>
+
+        
+
+            <div class="recommendation">
+                • Verify backups before restoring affected files.
+            </div>
+
+        
+
+            <div class="recommendation">
+                • Keep RDRS monitoring enabled until the incident is resolved.
+            </div>
+
+        
+
+    </section>
+
+
+    <!-- REPORT INFORMATION -->
+
+    <section>
+
+        <h2>
+            Report Information
+        </h2>
+
+        <p>
+            <strong>Report Generated:</strong>
+            09 September 2026 at 12:47:12 PM
+        </p>
+
+        <p>
+            <strong>Report Type:</strong>
+            RDRS HTML Incident Report
+        </p>
+
+    </section>
+
+
+    <div class="footer">
+
+        RDRS — Ransomware Detection and Response System<br>
+
+        This report is generated for security investigation
+        and incident documentation.
+
+    </div>
+
+</div>
+
+</body>
+</html>

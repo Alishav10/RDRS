@@ -111,6 +111,17 @@ def alerts():
                 {
                     "id": alert.id,
                     "severity": alert.severity,
+                    "classification": (
+                        alert.message.split(
+                            "Classification:",
+                            1
+                        )[1].split(
+                            "|",
+                            1
+                        )[0].strip()
+                        if "Classification:" in alert.message
+                        else "UNKNOWN"
+                    ),
                     "message": alert.message,
                     "timestamp": alert.timestamp.isoformat(),
                 }
@@ -689,15 +700,55 @@ def dashboard_data():
             .all()
         )
 
-        alerts_data = [
-            {
+        alerts_data = []
+
+        for alert in recent_alerts:
+
+            message = alert.message
+
+            classification = "UNKNOWN"
+            title = "Suspicious Activity"
+
+            if "Classification:" in message:
+                classification_part = message.split(
+                    "Classification:",
+                    1
+                )[1]
+
+                classification = classification_part.split(
+                    "|",
+                    1
+                )[0].strip()
+
+            if "Possible Ransomware Attack" in message:
+                title = "Possible Ransomware Attack"
+
+            elif "Ransomware-Like File Activity" in message:
+                title = "Ransomware-Like File Activity"
+
+            elif "Rapid File Modification" in message:
+                title = "Rapid File Modification"
+
+            elif "Mass File Rename Activity" in message:
+                title = "Mass File Rename Activity"
+
+            elif "High Entropy File Activity" in message:
+                title = "High Entropy File Activity"
+
+            elif "Suspicious File Extension Changes" in message:
+                title = "Suspicious File Extension Changes"
+
+            elif "Suspicious File Activity" in message:
+                title = "Suspicious File Activity"
+
+            alerts_data.append({
                 "id": alert.id,
                 "severity": alert.severity,
-                "message": alert.message,
+                "classification": classification,
+                "title": title,
+                "message": message,
                 "timestamp": alert.timestamp.isoformat(),
-            }
-            for alert in recent_alerts
-        ]
+            })
         # ---------------------------------------------------------
         # 8.5. RECENT INCIDENTS
         # ---------------------------------------------------------
@@ -709,16 +760,33 @@ def dashboard_data():
             .all()
         )
 
-        incidents_data = [
-            {
+        incidents_data = []
+
+        for incident in recent_incidents:
+
+            description = incident.description or ""
+
+            classification = "UNKNOWN"
+
+            if "Classification:" in description:
+                classification_part = description.split(
+                    "Classification:",
+                    1
+                )[1]
+
+                classification = classification_part.split(
+                    "\n",
+                    1
+                )[0].strip()
+
+            incidents_data.append({
                 "id": incident.id,
                 "title": incident.title,
+                "classification": classification,
                 "severity": incident.severity,
                 "status": incident.status,
                 "timestamp": incident.timestamp.isoformat(),
-            }
-            for incident in recent_incidents
-        ]
+            })
         # ---------------------------------------------------------
         # 9. RECENT EVENTS
         # ---------------------------------------------------------

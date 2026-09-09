@@ -1,0 +1,56 @@
+{
+    "report": {
+        "title": "RDRS Incident Report",
+        "generated_at": "2026-09-07T18:54:12.919267",
+        "incident_id": 35
+    },
+    "incident": {
+        "title": "Possible Ransomware Activity",
+        "severity": "CRITICAL",
+        "status": "OPEN",
+        "timestamp": "2026-09-07T16:29:28.344577",
+        "description": "RDRS detected suspicious ransomware-like file activity.\n\nThreat score: 95\nSeverity: CRITICAL\nSuspect process: python.exe\n\nReasons:\n- High file modification rate\n- Multiple extension changes\n- High file entropy\n\nAffected files:\n- data/sandbox/test1.txt\n- data/sandbox/test2.txt"
+    },
+    "threat_assessment": {
+        "score": 95.0,
+        "score_range": "0-100",
+        "threat_level": "CRITICAL"
+    },
+    "suspect_process": "python.exe",
+    "affected_files": [
+        "data/sandbox/test1.txt",
+        "data/sandbox/test2.txt"
+    ],
+    "timeline": [
+        {
+            "timestamp": "2026-09-07T16:29:28.316451",
+            "event_type": "MODIFY",
+            "file_path": "data\\sandbox\\test.txt",
+            "extension": ".txt",
+            "old_path": null
+        },
+        {
+            "timestamp": "2026-09-07T16:29:28.328552",
+            "event_type": "MODIFY",
+            "file_path": "data\\sandbox\\test.txt",
+            "extension": ".txt",
+            "old_path": null
+        },
+        {
+            "timestamp": "2026-09-07T16:29:33.883989",
+            "event_type": "MODIFY",
+            "file_path": "data\\sandbox\\test.txt",
+            "extension": ".txt",
+            "old_path": null
+        }
+    ],
+    "recommendations": [
+        "Isolate the suspected endpoint from the network.",
+        "Preserve original evidence for investigation.",
+        "Review the suspect process and its parent process.",
+        "Review recent file modification and rename activity.",
+        "Check authentication and system logs for related activity.",
+        "Verify backups before restoring affected files.",
+        "Keep RDRS monitoring enabled until the incident is resolved."
+    ]
+}

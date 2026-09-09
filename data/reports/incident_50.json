@@ -1,0 +1,376 @@
+{
+    "report": {
+        "title": "RDRS Incident Report",
+        "generated_at": "2026-09-09T12:30:29.917896",
+        "incident_id": 50
+    },
+    "incident": {
+        "title": "Ransomware-Like File Activity",
+        "severity": "CRITICAL",
+        "status": "OPEN",
+        "timestamp": "2026-09-09T12:28:51.774882",
+        "description": "RDRS detected suspicious ransomware-like Classification: RANSOMWARE_LIKE_FILE_ACTIVITY\nClassification Summary: Rapid file modification and mass rename activity were detected together.\n\nThreat score: 70\nSeverity: CRITICAL\nSuspect process: RDRS monitored activity\n\nReasons:\n- Rapid encryption/modification activity (+40)\n- Mass file rename activity (+30)\n\nAffected files:\n- data\\sandbox\\normal_0.txt\n- data\\sandbox\\normal_1.txt\n- data\\sandbox\\rapid_0.txt\n- data\\sandbox\\rapid_1.txt\n- data\\sandbox\\rapid_2.txt\n- data\\sandbox\\rapid_3.txt\n- data\\sandbox\\rapid_4.txt\n- data\\sandbox\\rapid_5.txt\n- data\\sandbox\\massrename_0.txt\n- data\\sandbox\\massrename_0.demo.txt\n- data\\sandbox\\massrename_1.txt\n- data\\sandbox\\massrename_1.demo.txt\n- data\\sandbox\\massrename_2.txt\n- data\\sandbox\\massrename_2.demo.txt"
+    },
+    "threat_assessment": {
+        "score": 70.0,
+        "score_range": "0-100",
+        "threat_level": "CRITICAL"
+    },
+    "suspect_process": "RDRS monitored activity",
+    "affected_files": [
+        "data\\sandbox\\massrename_0.demo.txt",
+        "data\\sandbox\\massrename_0.txt",
+        "data\\sandbox\\massrename_1.demo.txt",
+        "data\\sandbox\\massrename_1.txt",
+        "data\\sandbox\\massrename_2.demo.txt",
+        "data\\sandbox\\massrename_2.txt",
+        "data\\sandbox\\normal_0.txt",
+        "data\\sandbox\\normal_1.txt",
+        "data\\sandbox\\rapid_0.txt",
+        "data\\sandbox\\rapid_1.txt",
+        "data\\sandbox\\rapid_2.txt",
+        "data\\sandbox\\rapid_3.txt",
+        "data\\sandbox\\rapid_4.txt",
+        "data\\sandbox\\rapid_5.txt"
+    ],
+    "timeline": [
+        {
+            "timestamp": "2026-09-09T12:27:52.097891",
+            "event_type": "MODIFY",
+            "file_path": "data\\sandbox\\normal_0.txt",
+            "extension": ".txt",
+            "old_path": null
+        },
+        {
+            "timestamp": "2026-09-09T12:27:55.507756",
+            "event_type": "MODIFY",
+            "file_path": "data\\sandbox\\normal_1.txt",
+            "extension": ".txt",
+            "old_path": null
+        },
+        {
+            "timestamp": "2026-09-09T12:27:55.519430",
+            "event_type": "MODIFY",
+            "file_path": "data\\sandbox\\normal_0.txt",
+            "extension": ".txt",
+            "old_path": null
+        },
+        {
+            "timestamp": "2026-09-09T12:28:16.391142",
+            "event_type": "MODIFY",
+            "file_path": "data\\sandbox\\normal_0.txt",
+            "extension": ".txt",
+            "old_path": null
+        },
+        {
+            "timestamp": "2026-09-09T12:28:16.454153",
+            "event_type": "MODIFY",
+            "file_path": "data\\sandbox\\normal_0.txt",
+            "extension": ".txt",
+            "old_path": null
+        },
+        {
+            "timestamp": "2026-09-09T12:28:17.393449",
+            "event_type": "MODIFY",
+            "file_path": "data\\sandbox\\normal_1.txt",
+            "extension": ".txt",
+            "old_path": null
+        },
+        {
+            "timestamp": "2026-09-09T12:28:17.421452",
+            "event_type": "MODIFY",
+            "file_path": "data\\sandbox\\normal_1.txt",
+            "extension": ".txt",
+            "old_path": null
+        },
+        {
+            "timestamp": "2026-09-09T12:28:19.739233",
+            "event_type": "MODIFY",
+            "file_path": "data\\sandbox\\normal_0.txt",
+            "extension": ".txt",
+            "old_path": null
+        },
+        {
+            "timestamp": "2026-09-09T12:28:20.202747",
+            "event_type": "MODIFY",
+            "file_path": "data\\sandbox\\normal_1.txt",
+            "extension": ".txt",
+            "old_path": null
+        },
+        {
+            "timestamp": "2026-09-09T12:28:23.213019",
+            "event_type": "MODIFY",
+            "file_path": "data\\sandbox\\normal_1.txt",
+            "extension": ".txt",
+            "old_path": null
+        },
+        {
+            "timestamp": "2026-09-09T12:28:23.481436",
+            "event_type": "MODIFY",
+            "file_path": "data\\sandbox\\normal_0.txt",
+            "extension": ".txt",
+            "old_path": null
+        },
+        {
+            "timestamp": "2026-09-09T12:28:37.168731",
+            "event_type": "CREATE",
+            "file_path": "data\\sandbox\\rapid_0.txt",
+            "extension": ".txt",
+            "old_path": null
+        },
+        {
+            "timestamp": "2026-09-09T12:28:37.219707",
+            "event_type": "MODIFY",
+            "file_path": "data\\sandbox\\rapid_0.txt",
+            "extension": ".txt",
+            "old_path": null
+        },
+        {
+            "timestamp": "2026-09-09T12:28:37.271724",
+            "event_type": "CREATE",
+            "file_path": "data\\sandbox\\rapid_1.txt",
+            "extension": ".txt",
+            "old_path": null
+        },
+        {
+            "timestamp": "2026-09-09T12:28:37.281541",
+            "event_type": "MODIFY",
+            "file_path": "data\\sandbox\\rapid_1.txt",
+            "extension": ".txt",
+            "old_path": null
+        },
+        {
+            "timestamp": "2026-09-09T12:28:37.372976",
+            "event_type": "CREATE",
+            "file_path": "data\\sandbox\\rapid_2.txt",
+            "extension": ".txt",
+            "old_path": null
+        },
+        {
+            "timestamp": "2026-09-09T12:28:37.383938",
+            "event_type": "MODIFY",
+            "file_path": "data\\sandbox\\rapid_2.txt",
+            "extension": ".txt",
+            "old_path": null
+        },
+        {
+            "timestamp": "2026-09-09T12:28:37.495300",
+            "event_type": "CREATE",
+            "file_path": "data\\sandbox\\rapid_3.txt",
+            "extension": ".txt",
+            "old_path": null
+        },
+        {
+            "timestamp": "2026-09-09T12:28:37.525357",
+            "event_type": "MODIFY",
+            "file_path": "data\\sandbox\\rapid_3.txt",
+            "extension": ".txt",
+            "old_path": null
+        },
+        {
+            "timestamp": "2026-09-09T12:28:37.599802",
+            "event_type": "CREATE",
+            "file_path": "data\\sandbox\\rapid_4.txt",
+            "extension": ".txt",
+            "old_path": null
+        },
+        {
+            "timestamp": "2026-09-09T12:28:37.609615",
+            "event_type": "MODIFY",
+            "file_path": "data\\sandbox\\rapid_4.txt",
+            "extension": ".txt",
+            "old_path": null
+        },
+        {
+            "timestamp": "2026-09-09T12:28:37.699853",
+            "event_type": "CREATE",
+            "file_path": "data\\sandbox\\rapid_5.txt",
+            "extension": ".txt",
+            "old_path": null
+        },
+        {
+            "timestamp": "2026-09-09T12:28:37.710656",
+            "event_type": "MODIFY",
+            "file_path": "data\\sandbox\\rapid_5.txt",
+            "extension": ".txt",
+            "old_path": null
+        },
+        {
+            "timestamp": "2026-09-09T12:28:39.942544",
+            "event_type": "MODIFY",
+            "file_path": "data\\sandbox\\rapid_5.txt",
+            "extension": ".txt",
+            "old_path": null
+        },
+        {
+            "timestamp": "2026-09-09T12:28:41.369341",
+            "event_type": "MODIFY",
+            "file_path": "data\\sandbox\\rapid_4.txt",
+            "extension": ".txt",
+            "old_path": null
+        },
+        {
+            "timestamp": "2026-09-09T12:28:42.239082",
+            "event_type": "MODIFY",
+            "file_path": "data\\sandbox\\rapid_3.txt",
+            "extension": ".txt",
+            "old_path": null
+        },
+        {
+            "timestamp": "2026-09-09T12:28:42.651723",
+            "event_type": "MODIFY",
+            "file_path": "data\\sandbox\\rapid_2.txt",
+            "extension": ".txt",
+            "old_path": null
+        },
+        {
+            "timestamp": "2026-09-09T12:28:42.667643",
+            "event_type": "MODIFY",
+            "file_path": "data\\sandbox\\rapid_0.txt",
+            "extension": ".txt",
+            "old_path": null
+        },
+        {
+            "timestamp": "2026-09-09T12:28:42.682747",
+            "event_type": "MODIFY",
+            "file_path": "data\\sandbox\\rapid_1.txt",
+            "extension": ".txt",
+            "old_path": null
+        },
+        {
+            "timestamp": "2026-09-09T12:28:50.609734",
+            "event_type": "CREATE",
+            "file_path": "data\\sandbox\\massrename_0.txt",
+            "extension": ".txt",
+            "old_path": null
+        },
+        {
+            "timestamp": "2026-09-09T12:28:51.625149",
+            "event_type": "MODIFY",
+            "file_path": "data\\sandbox\\massrename_0.txt",
+            "extension": ".txt",
+            "old_path": null
+        },
+        {
+            "timestamp": "2026-09-09T12:28:51.668374",
+            "event_type": "RENAME",
+            "file_path": "data\\sandbox\\massrename_0.demo.txt",
+            "extension": ".txt",
+            "old_path": "data\\sandbox\\massrename_0.txt"
+        },
+        {
+            "timestamp": "2026-09-09T12:28:51.681386",
+            "event_type": "CREATE",
+            "file_path": "data\\sandbox\\massrename_1.txt",
+            "extension": ".txt",
+            "old_path": null
+        },
+        {
+            "timestamp": "2026-09-09T12:28:51.692251",
+            "event_type": "MODIFY",
+            "file_path": "data\\sandbox\\massrename_1.txt",
+            "extension": ".txt",
+            "old_path": null
+        },
+        {
+            "timestamp": "2026-09-09T12:28:51.708758",
+            "event_type": "RENAME",
+            "file_path": "data\\sandbox\\massrename_1.demo.txt",
+            "extension": ".txt",
+            "old_path": "data\\sandbox\\massrename_1.txt"
+        },
+        {
+            "timestamp": "2026-09-09T12:28:51.724740",
+            "event_type": "CREATE",
+            "file_path": "data\\sandbox\\massrename_2.txt",
+            "extension": ".txt",
+            "old_path": null
+        },
+        {
+            "timestamp": "2026-09-09T12:28:51.739568",
+            "event_type": "MODIFY",
+            "file_path": "data\\sandbox\\massrename_2.txt",
+            "extension": ".txt",
+            "old_path": null
+        },
+        {
+            "timestamp": "2026-09-09T12:28:51.750134",
+            "event_type": "RENAME",
+            "file_path": "data\\sandbox\\massrename_2.demo.txt",
+            "extension": ".txt",
+            "old_path": "data\\sandbox\\massrename_2.txt"
+        },
+        {
+            "timestamp": "2026-09-09T12:28:54.646053",
+            "event_type": "MODIFY",
+            "file_path": "data\\sandbox\\massrename_2.demo.txt",
+            "extension": ".txt",
+            "old_path": null
+        },
+        {
+            "timestamp": "2026-09-09T12:28:55.082264",
+            "event_type": "MODIFY",
+            "file_path": "data\\sandbox\\massrename_1.demo.txt",
+            "extension": ".txt",
+            "old_path": null
+        },
+        {
+            "timestamp": "2026-09-09T12:28:55.095533",
+            "event_type": "MODIFY",
+            "file_path": "data\\sandbox\\massrename_0.demo.txt",
+            "extension": ".txt",
+            "old_path": null
+        },
+        {
+            "timestamp": "2026-09-09T12:28:55.112047",
+            "event_type": "MODIFY",
+            "file_path": "data\\sandbox\\rapid_5.txt",
+            "extension": ".txt",
+            "old_path": null
+        },
+        {
+            "timestamp": "2026-09-09T12:28:55.379259",
+            "event_type": "MODIFY",
+            "file_path": "data\\sandbox\\rapid_4.txt",
+            "extension": ".txt",
+            "old_path": null
+        },
+        {
+            "timestamp": "2026-09-09T12:28:55.410629",
+            "event_type": "MODIFY",
+            "file_path": "data\\sandbox\\rapid_3.txt",
+            "extension": ".txt",
+            "old_path": null
+        },
+        {
+            "timestamp": "2026-09-09T12:28:55.427969",
+            "event_type": "MODIFY",
+            "file_path": "data\\sandbox\\rapid_2.txt",
+            "extension": ".txt",
+            "old_path": null
+        },
+        {
+            "timestamp": "2026-09-09T12:28:55.461676",
+            "event_type": "MODIFY",
+            "file_path": "data\\sandbox\\rapid_1.txt",
+            "extension": ".txt",
+            "old_path": null
+        },
+        {
+            "timestamp": "2026-09-09T12:28:55.495409",
+            "event_type": "MODIFY",
+            "file_path": "data\\sandbox\\rapid_0.txt",
+            "extension": ".txt",
+            "old_path": null
+        }
+    ],
+    "recommendations": [
+        "Isolate the suspected endpoint from the network.",
+        "Preserve original evidence for investigation.",
+        "Review the suspect process and its parent process.",
+        "Review recent file modification and rename activity.",
+        "Check authentication and system logs for related activity.",
+        "Verify backups before restoring affected files.",
+        "Keep RDRS monitoring enabled until the incident is resolved."
+    ]
+}

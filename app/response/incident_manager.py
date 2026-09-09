@@ -43,10 +43,14 @@ class IncidentManager:
         reasons,
         affected_files,
         suspect_process=None,
+        classification=None,
     ):
         description = (
             "RDRS detected suspicious ransomware-like "
-            "file activity.\n\n"
+            f"Classification: "
+            f"{classification.classification if classification else 'UNKNOWN'}\n"
+            f"Classification Summary: "
+            f"{classification.summary if classification else 'No classification available.'}\n\n"
             f"Threat score: {score}\n"
             f"Severity: {severity}\n"
             f"Suspect process: "
@@ -72,7 +76,11 @@ class IncidentManager:
             # -------------------------------------------------
 
             incident = Incident(
-                title="Possible Ransomware Activity",
+                title=(
+                    classification.title
+                    if classification
+                    else "Possible Ransomware Activity"
+                    ),
                 description=description,
                 severity=severity,
                 status="OPEN",
@@ -92,8 +100,10 @@ class IncidentManager:
             alert = Alert(
                 severity=severity,
                 message=(
-                    f"Possible ransomware activity detected. "
-                    f"Incident ID: {incident_id}. "
+                    f"{classification.title if classification else 'Suspicious Activity'} "
+                    f"| Classification: "
+                    f"{classification.classification if classification else 'UNKNOWN'} "
+                    f"| Incident ID: {incident_id}. "
                     f"Threat score: {score}/100. "
                     f"Suspect process: "
                     f"{suspect_process or 'Unknown'}"

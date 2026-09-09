@@ -6,6 +6,7 @@ from app.core.logging_config import (
 from app.response.incident_manager import IncidentManager
 from app.response.evidence_manager import EvidenceManager
 from app.response.score_manager import ScoreManager
+from app.detectors.alert_classifier import AlertClassifier
 
 
 class ResponseManager:
@@ -20,6 +21,8 @@ class ResponseManager:
         self.incident_manager = IncidentManager()
         self.evidence_manager = EvidenceManager()
         self.score_manager = ScoreManager()
+
+        self.alert_classifier = AlertClassifier()
 
         self.alert_logger = get_alert_logger()
         self.audit_logger = get_audit_logger()
@@ -43,6 +46,7 @@ class ResponseManager:
         - logs alert/audit information
         - copies evidence
         """
+        classification = self.alert_classifier.classify(signal)
 
         score_id = self.score_manager.save_score(
             score=signal.threat_score,
@@ -56,6 +60,8 @@ class ResponseManager:
                 "score_id": score_id,
                 "incident_id": None,
                 "copied_files": [],
+                "classification": classification.classification,
+                "title": classification.title,
             }
 
         incident_id = self.incident_manager.create_incident(
@@ -64,6 +70,7 @@ class ResponseManager:
             reasons=signal.scoring_reasons,
             affected_files=affected_files,
             suspect_process=suspect_process,
+            classification=classification,
         )
 
         copied_files = (
@@ -93,4 +100,6 @@ class ResponseManager:
             "score_id": score_id,
             "incident_id": incident_id,
             "copied_files": copied_files,
+            "classification": classification.classification,
+            "title": classification.title,
         }
